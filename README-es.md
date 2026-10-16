@@ -6,7 +6,7 @@
 
 *Cuando una acción cruza el límite del sandbox, un segundo modelo lee la evidencia y devuelve un veredicto con su razón — para que los humanos no aprueben nada y nada inseguro se cuele.*
 
-> **Repositorio oficial.** Este es el único repositorio oficial de dsh-auto-review, mantenido por PerryLink. Los repositorios del mismo nombre bajo otras cuentas no están afiliados.
+> **Esto es un fork.** El proyecto original — y su único repositorio oficial — es [PerryLink/dsh-auto-review](https://github.com/PerryLink/dsh-auto-review), mantenido por PerryLink. Este fork incluye una rama `desktop` que porta el plugin a DeepSeek Harness `0.2.0-rc.2`; no está afiliado ni respaldado por el autor original. Véase [docs/desktop-port.md](docs/desktop-port.md).
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Gitee](https://img.shields.io/badge/Gitee-mirror-c71d23?logo=gitee)](https://gitee.com/perrylink/dsh-auto-review)
@@ -27,6 +27,14 @@
 ---
 
 **📖 Base de conocimiento del ecosistema** — datos medidos, no marketing: [guía de desarrollo · datos de selección · criterios de mantenimiento](https://perrylink.github.io/dsh-plugin-guide/).
+
+## ⚠️ Rama desktop — DeepSeek Harness `0.2.0-rc.2`
+
+**Esta es la rama `desktop` de un fork, no la versión original.** Apunta al tiempo de ejecución de escritorio de DeepSeek Harness **`0.2.0-rc.2`** — lo que `@deepseek-ai/dsh` publica como `latest` — mientras que el `main` original apunta a `0.2.1-alpha.1`.
+
+- **No instale esta rama desde npm.** El registro sirve la versión original `0.12.17`, cuyas dependencias de ejecución elevan un árbol `0.2.1-alpha.1` por encima de un perfil `0.2.0-rc.2` y **provocan un fallo de arranque**. Esta rama no tiene ninguna dependencia de ejecución `@deepseek-ai/*`.
+- **Instálela desde esta rama** — los comandos y el único parche de perfil que necesita (el preset de permisos `review`) están en [docs/desktop-port.md](docs/desktop-port.md). Sin ese preset el plugin se monta pero queda inerte (cierre en fallo, nunca apertura en fallo).
+- El port también corrige cuatro defectos: un fallo de lectura de preset que podía reabrir una puerta cerrada (**apertura en fallo**), un override de `/auto-review on` que el answerer ignora, credenciales dentro de una línea de comandos que llegaban íntegras al revisor, y evidencia truncada que se leía como evidencia completa.
 
 <!-- star-cta -->
 ## ⭐ 如果它帮到了你

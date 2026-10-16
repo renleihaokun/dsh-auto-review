@@ -6,7 +6,7 @@
 
 *当某个动作越过沙箱边界时，第二模型读取证据并给出带有理由的裁决 —— 人类无需批准任何事，同时也没有任何不安全的东西蒙混过关。*
 
-> **官方仓库。** 本仓库是 dsh-auto-review 的唯一官方仓库，由 PerryLink 维护。其他账号下的同名仓库与本项目无关。
+> **这是 fork。** 上游项目（也是其唯一官方仓库）是 [PerryLink/dsh-auto-review](https://github.com/PerryLink/dsh-auto-review)，由 PerryLink 维护。本仓库带一个 `desktop` 分支，把该插件移植到 DeepSeek Harness `0.2.0-rc.2`；与上游作者无从属关系、也未获其背书。详见 [docs/desktop-port.zh.md](docs/desktop-port.zh.md)。
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Gitee](https://img.shields.io/badge/Gitee-mirror-c71d23?logo=gitee)](https://gitee.com/perrylink/dsh-auto-review)
@@ -27,6 +27,14 @@
 ---
 
 **📖 生态实测知识库**（实测数据，不是营销）：[插件开发指南 · 选型实测数据 · 维护取舍判据](https://perrylink.github.io/dsh-plugin-guide/)。
+
+## ⚠️ 桌面端分支 —— DeepSeek Harness `0.2.0-rc.2`
+
+**这是 fork 的 `desktop` 分支，不是上游发布版。** 它面向 DeepSeek Harness 桌面端运行时 **`0.2.0-rc.2`**（即 `@deepseek-ai/dsh` 当前的 `latest`），而上游 `main` 面向 `0.2.1-alpha.1`。
+
+- **不要从 npm 装这个分支。** registry 上的 `0.12.17` 是上游版，它的运行时依赖会把 `0.2.1-alpha.1` 的 harness 依赖树提升到 `0.2.0-rc.2` 的 profile 之上，并**导致开机崩溃**。本分支的 `dependencies` 里已经**没有任何 `@deepseek-ai/*` 包**。
+- **从本分支安装** —— 命令、以及它唯一需要的那段 profile patch（`review` 权限档位）都在 [docs/desktop-port.zh.md](docs/desktop-port.zh.md)。不加那段档位，插件会挂载但空转（永远 fail-closed，不会 fail-open）。
+- 这次移植还修掉了四个缺陷：档位读取失败会**重新打开**已关闭的门（**fail-open**）、`/auto-review on` 写入 answerer 根本不看的覆盖、命令行里的凭据原样送到审查方面前、以及被截断的证据被当成完整证据。
 
 <!-- star-cta -->
 ## ⭐ 如果它帮到了你

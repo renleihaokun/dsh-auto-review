@@ -2,6 +2,31 @@
 
 All notable changes to `dsh-auto-review` are documented here. The repo is pre-release; versions follow the DeepSeek Harness `0.1.0-rc.x` target runtime and bump on every behavior change.
 
+## [0.12.17-desktop.1] - 2026-10-16
+
+**Desktop branch** (`desktop`) — this fork targets DeepSeek Harness **`0.2.0-rc.2`** instead of upstream's `0.2.1-alpha.1` line. Install, the required profile patch, the full change list and the known limitations live in [docs/desktop-port.md](docs/desktop-port.md).
+
+### Fixed
+
+- **Installing the package into a `0.2.0-rc.2` profile shadowed the runtime and crashed boot.** Upstream keeps fourteen `@deepseek-ai/dsh-*` integration packages in `dependencies` so the shipped `dsh-eval` face works out of the box. A profile install HOISTS that tree into the profile's own `node_modules`, and `dsh-app-boot` resolves the profile's `node_modules` first — so a `0.2.1-alpha.1` tree was what a `0.2.0-rc.2` host loaded. The branch removes the hazard instead of pinning around it: `dependencies` now holds only `tsdown`, `typescript`, `yaml` and `zod`, and NO `@deepseek-ai/*` package is a runtime dependency. `test/desktop-port.spec.ts` pins that invariant.
+- **A preset read failure re-opened a closed gate (fail-OPEN).** `presetGateState` reported `mounted: false` when the permission-preset service threw, which fell through to the sticky session override — so a stale in-memory `true` kept auto-review claiming requests after the preset became unreadable. A read failure now reports `mounted: true, on: false`, and the gate stays shut.
+- **`/auto-review on` recorded an override the answerer ignores.** While the gate preset was not selected the command still wrote a durable `autoReview/state { enabled: true }`, which read back as "already ON" for the rest of the session. It now refuses with the exact `/permission review` remedy and writes nothing.
+- **Secrets inside a free-form string argument reached the reviewer verbatim.** The key-based redaction inspects object KEYS only, so a shell command line such as `deploy --token sk-live-123` or `curl -H "Authorization: Bearer …"` passed through intact. Both rendering paths are covered now — the pending call's own preview (`sanitizeArguments`) and the compact transcript line (`contextLine`).
+- **Truncated evidence read as complete evidence.** The pending call's preview was cut at `reasonMaxChars` behind a bare `…`, so a reviewer that could see only the benign head of a long call could still allow it. A truncated preview is now labelled `TRUNCATED` with the exact counts (`only the first <n> of <m> characters are shown`), and the verdict rules gained the matching `- truncated evidence counts as insufficient: when the arguments are marked TRUNCATED, DENY.`
+- **The review panel showed all zeros.** The `autoReview` projection folds the plugin's own `autoReview/*` session events, and on a host that refuses unmarked unknown event types — `auditMayAppend()` false, which the `0.2.0-rc.2` line is — none of them is ever written, so the panel folded an empty log. The projection state now carries the owning `sessionId` (state version 4) and the runtime substitutes a live view that serves the switch state and the session's real activity from the in-memory mirror; on a marker-aware host the pure fold stays authoritative.
+- **The client half was missing the package that mounts `remote.commands`.** `dsh.client.inject` listed `@deepseek-ai/dsh-client-ui-slots` but not `@deepseek-ai/dsh-api-remotes`, which is the namespace merge the panel's approve buttons call through (`ctx.remote.commands.execute`). `@deepseek-ai/dsh-api-remotes` is now listed and declared as an optional peer; the panel registers and the approve buttons execute on `0.2.0-rc.2` (verified live).
+
+### Changed
+
+- **"second model" was the wrong description.** The reviewer runs on `spawn` — a fresh child that inherits none of the requesting session's turns — so it is the SAME model reading the evidence independently, not a second model. The wording is corrected in `src/index.ts`, `src/cache.ts`, `src/config.ts`, `src/projection-types.ts`, both `src/messages.ts` tables, and the shipped `cordis.patch.yml`, which now sets `reviewerProvider: spawn` explicitly (the schema default is `fork`, which seeds the reviewer from the very turns it is judging).
+- The bundle patch's row id is `perrylink-auto-review`, because the desktop profile's built-in experimental auto-review bundle already inserts `id: auto-review` and two inserts must not share an id. `toolsPolicy.overrides` covers both `bash` and `pwsh`, so the shipped patch works whichever shell tool a profile provides.
+- `pnpm-workspace.yaml` pins the whole `@deepseek-ai/dsh-*` graph to `0.2.0-rc.2`, and the dev graph follows it (`@deepseek-ai/cordis ^4.0.4`, `@deepseek-ai/schemastery ^3.18.4`). This graph is build/test only — nothing in it can reach a consumer profile.
+
+### Added
+
+- `docs/desktop-port.md` — install, the required profile patch, the complete change list, verification evidence, and the known limitations.
+- `test/desktop-port.spec.ts` — a regression case per fix above, including the dependency-policy invariant.
+
 ## [0.12.17] - 2026-10-10
 
 ### Fixed

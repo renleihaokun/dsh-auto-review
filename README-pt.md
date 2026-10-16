@@ -6,7 +6,7 @@
 
 *Quando uma ação cruza a fronteira do sandbox, um segundo modelo lê as evidências e devolve um veredito com a razão — para que humanos não aprovem nada e nada inseguro passe despercebido.*
 
-> **Repositório oficial.** Este é o único repositório oficial do dsh-auto-review, mantido por PerryLink. Repositórios de mesmo nome sob outras contas não são afiliados.
+> **Isto é um fork.** O projeto original — e seu único repositório oficial — é [PerryLink/dsh-auto-review](https://github.com/PerryLink/dsh-auto-review), mantido por PerryLink. Este fork traz uma branch `desktop` que porta o plugin para o DeepSeek Harness `0.2.0-rc.2`; não é afiliado nem endossado pelo autor original. Veja [docs/desktop-port.md](docs/desktop-port.md).
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Gitee](https://img.shields.io/badge/Gitee-mirror-c71d23?logo=gitee)](https://gitee.com/perrylink/dsh-auto-review)
@@ -27,6 +27,14 @@
 ---
 
 **📖 Base de conhecimento do ecossistema** — dados medidos, não marketing: [guia de desenvolvimento · dados de seleção · critérios de manutenção](https://perrylink.github.io/dsh-plugin-guide/).
+
+## ⚠️ Branch desktop — DeepSeek Harness `0.2.0-rc.2`
+
+**Esta é a branch `desktop` de um fork, não a versão original.** Ela aponta para o runtime de desktop do DeepSeek Harness **`0.2.0-rc.2`** — o que `@deepseek-ai/dsh` publica como `latest` — enquanto o `main` original aponta para `0.2.1-alpha.1`.
+
+- **Não instale esta branch pelo npm.** O registro serve a versão original `0.12.17`, cujas dependências de runtime elevam uma árvore `0.2.1-alpha.1` sobre um perfil `0.2.0-rc.2` e **derrubam a inicialização**. Esta branch não tem nenhuma dependência de runtime `@deepseek-ai/*`.
+- **Instale a partir desta branch** — os comandos e o único patch de perfil necessário (o preset de permissão `review`) estão em [docs/desktop-port.md](docs/desktop-port.md). Sem esse preset o plugin é montado mas fica inerte (falha fechada, nunca abertura em falha).
+- O port também corrige quatro defeitos: uma falha de leitura de preset que podia reabrir um portão fechado (**abertura em falha**), um override de `/auto-review on` que o answerer ignora, credenciais dentro de uma linha de comando chegando intactas ao revisor, e evidência truncada sendo lida como evidência completa.
 
 <!-- star-cta -->
 ## ⭐ 如果它帮到了你

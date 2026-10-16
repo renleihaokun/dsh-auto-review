@@ -9,7 +9,7 @@
 
 *When an action crosses the sandbox boundary, a second model reads the evidence and returns a verdict with a reason — so humans approve nothing while nothing unsafe slips through.*
 
-> **Official repository.** This is the only official repository of dsh-auto-review, maintained by PerryLink. Same-name repositories under other accounts are not affiliated.
+> **This is a fork.** The upstream project — and its only official repository — is [PerryLink/dsh-auto-review](https://github.com/PerryLink/dsh-auto-review), maintained by PerryLink. This fork carries a `desktop` branch that ports the plugin to DeepSeek Harness `0.2.0-rc.2`; it is not affiliated with or endorsed by the upstream author. See [docs/desktop-port.md](docs/desktop-port.md).
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![DSH plugin](https://img.shields.io/badge/dsh--plugin-✅-green)](https://github.com/topics/dsh-plugin)
@@ -28,6 +28,14 @@
 ---
 
 **📖 Ecosystem knowledge base** — measured data, not marketing: [plugin development guide · plugin-selection data · maintenance criteria](https://perrylink.github.io/dsh-plugin-guide/).
+
+## ⚠️ Desktop branch — DeepSeek Harness `0.2.0-rc.2`
+
+**This is the `desktop` branch of a fork, not the upstream release.** It targets the DeepSeek Harness desktop runtime **`0.2.0-rc.2`** — what `@deepseek-ai/dsh` publishes as `latest` — while upstream `main` targets `0.2.1-alpha.1`.
+
+- **Do not install this branch from npm.** The registry serves upstream `0.12.17`, whose runtime dependencies hoist a `0.2.1-alpha.1` harness tree over a `0.2.0-rc.2` profile and **crash boot**. This branch has no `@deepseek-ai/*` runtime dependency at all.
+- **Install it from this branch** — the commands, and the single profile patch it needs (the `review` permission preset), are in [docs/desktop-port.md](docs/desktop-port.md). Without that preset the plugin mounts but stays inert (fail-closed, never fail-open).
+- The port also fixes four defects found while writing it: a preset-read failure that could re-open a closed gate (**fail-open**), an `/auto-review on` override the answerer ignores, credentials inside a shell command line reaching the reviewer verbatim, and truncated evidence reading as complete evidence.
 
 <!-- star-cta -->
 ## ⭐ 如果它帮到了你

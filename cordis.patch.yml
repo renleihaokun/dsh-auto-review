@@ -6,22 +6,83 @@
 # declaration auto-registers its browser half (a session-header action), and
 # the host half registers an `autoReview` session projection whenever the
 # profile provides the session-projection capability (the web profile does).
+#
+# Desktop branch (dsh 0.2.0-rc.2) — see docs/desktop-port.md. What changed here
+# against upstream's patch:
+#  * The row id is `perrylink-auto-review`, NOT `auto-review`: the desktop
+#    profile's built-in experimental auto-review bundle already inserts
+#    `id: auto-review`, and two inserts must not share an id.
+#  * `enableByDefault: false`: the answerer engages only while the session's
+#    permission preset is the gate preset (`review`, see src/runtime.ts).
+#    `enableByDefault` is the fallback used only when the profile mounts no
+#    `permissionPresets` service. Add the preset with the OPTIONAL block below.
+#  * `reviewerProvider: spawn`: the reviewer runs on a fresh child that does NOT
+#    inherit this session's turns. The default `fork` seeds the child from the
+#    parent's completed turns, which makes the requesting session also the
+#    judging session. `spawn` keeps the verdict independent of the context it
+#    is judging.
+#  * `fallbackPolicy: delegate`: a reviewer that cannot answer hands the
+#    request back to the human chain. Upstream's default (`rejected`) is
+#    equally fail-closed — neither policy can turn a failure into a grant.
+#  * Tool names cover both `bash` and `pwsh` so the shipped patch works
+#    whichever shell tool the profile provides (only the one that exists
+#    resolves a policy; the other is an inert key).
 - insert:
-    - id: auto-review
+    - id: perrylink-auto-review
       name: dsh-auto-review
       config:
+        # Fallback switch; the permission preset `review` is the real gate.
+        enableByDefault: false
+        # Reviewer/command copy language (`en` | `zh`).
+        language: en
+        # A reviewer that cannot answer hands the request back to the human
+        # chain instead of rejecting the tool call outright.
+        fallbackPolicy: delegate
+        # Independent verdict: a fresh child that inherits none of this
+        # session's turns (see the header note).
+        reviewerProvider: spawn
         toolsPolicy:
           # Tools NOT listed fall back to the schema default `human`
           # (delegate to the human answerer — the chain is never short-circuited).
-          # `edit` (in-place modification) is deliberately NOT AI-reviewed by
-          # default: add it here explicitly if you accept in-place edits without
-          # a human in the loop.
+          # `write`/`edit` ARE listed here: under a confining sandbox only
+          # ESCALATION asks reach this chain (`sandbox_permissions`), never
+          # in-workspace edits, so AI-reviewing the write-side tools does not
+          # remove the human from ordinary file edits.
           overrides:
             bash: ai
+            pwsh: ai
             write: ai
+            edit: ai
+    # OPTIONAL permission-preset gate — uncomment and add to YOUR profile patch
+    # layer. The answerer only engages while the session's preset is `review`,
+    # so without this block the plugin is mounted but INERT (fail-closed).
+    #
+    # It is deliberately NOT enabled here: this row replaces the WHOLE
+    # `permission` config, so a profile that already overrides `permission`
+    # (to customise its presets) would end up with two rows for one id.
+    # Restate every preset you want to keep when you add it.
+    #
+    # In the Web GUI the preset then appears in the permission dropdown; the
+    # running session switches to it with `/permission review`.
+    # - id: permission
+    #   name: '@deepseek-ai/dsh-permission-presets'
+    #   config:
+    #     presets:
+    #       read-only:
+    #         sandbox: read-only
+    #         approval: ask
+    #       workspace-write:
+    #         sandbox: workspace-write
+    #         approval: ask
+    #       danger-full-access:
+    #         sandbox: danger-full-access
+    #         approval: never
+    #       review:
+    #         sandbox: workspace-write
+    #         approval: ask
     # OPTIONAL invariant companion — uncomment and add to YOUR profile patch
     # layer only in compositions that provide the `invariants` service
     # (agent-spine apps such as headless/ACP). The plain web profile has no
     # invariants service, so this row would sit PENDING there and fail boot:
-    # - id: auto-review-invariant
+    # - id: perrylink-auto-review-invariant
     #   name: dsh-auto-review/invariant

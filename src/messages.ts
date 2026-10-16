@@ -22,6 +22,12 @@ export interface Messages {
   readonly recentLine: (labels: string) => string
   readonly unknownArg: (arg: string) => string
   readonly already: (state: string) => string
+  /**
+   * Refusal of `/auto-review on` while the session's permission preset is not
+   * the gate preset (local port patch): the preset is authoritative, so the
+   * command reports how to reach it instead of recording a dead override.
+   */
+  readonly presetGated: (preset: string) => string
   readonly switchedNotice: (enabled: boolean) => string
   readonly switchedResult: (state: string) => string
   readonly approveResult: (toolName: string, reviewId: string, minutes: number) => string
@@ -33,7 +39,7 @@ export interface Messages {
 
 const EN: Messages = {
   usage: 'Usage: /auto-review on|off|status|approve [n]',
-  description: 'enable or disable second-model AI auto-review for this session, inspect verdicts, or approve one retry',
+  description: 'enable or disable same-model independent AI auto-review for this session, inspect verdicts, or approve one retry',
   statusLine: enabled => `Auto-review is ${enabled ? 'ON' : 'OFF'} for this session.`,
   verdictsLine: (used, max) => `AI verdicts this turn: ${used}/${max}`,
   failuresLine: (used, max) => `Reviewer failures this turn: ${used}/${max}`,
@@ -42,6 +48,8 @@ const EN: Messages = {
   recentLine: labels => `Recent verdicts: ${labels}`,
   unknownArg: arg => `Unknown /auto-review argument "${arg}". Usage: /auto-review on|off|status|approve [n]`,
   already: state => `Auto-review is already ${state} for this session.`,
+  presetGated: preset => `Auto-review is controlled by the permission preset: the current preset is not "${preset}". `
+    + `Switch to it first with /permission ${preset}; no switch override is recorded while the preset is not selected.`,
   switchedNotice: enabled => `AI auto-review was switched ${enabled ? 'ON' : 'OFF'} for this session (changed by the user).`,
   switchedResult: state => `Auto-review ${state} for this session.`,
   approveResult: (toolName, reviewId, minutes) => [
@@ -61,7 +69,7 @@ const EN: Messages = {
 
 const ZH: Messages = {
   usage: '用法：/auto-review on|off|status|approve [n]',
-  description: '为本会话启用或禁用第二模型 AI 自动审查、查看裁决统计，或批准一次重试',
+  description: '为本会话启用或禁用同模型独立 AI 自动审查、查看裁决统计，或批准一次重试',
   statusLine: enabled => `本会话的自动审查已${enabled ? '开启' : '关闭'}。`,
   verdictsLine: (used, max) => `本回合 AI 裁决数：${used}/${max}`,
   failuresLine: (used, max) => `本回合审查失败数：${used}/${max}`,
@@ -70,6 +78,7 @@ const ZH: Messages = {
   recentLine: labels => `最近裁决：${labels}`,
   unknownArg: arg => `未知的 /auto-review 参数 "${arg}"。用法：/auto-review on|off|status|approve [n]`,
   already: state => `本会话的自动审查已处于 ${state} 状态。`,
+  presetGated: preset => `auto-review 由权限档位控制：当前档位不是 "${preset}"，请先用 /permission ${preset} 切换。档位未选中时不会记录任何开关覆盖。`,
   switchedNotice: enabled => `AI 自动审查已为本会话${enabled ? '开启' : '关闭'}（由用户更改）。`,
   switchedResult: state => `本会话的自动审查已${state}。`,
   approveResult: (toolName, reviewId, minutes) => [

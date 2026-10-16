@@ -2,7 +2,7 @@
  * Same-fingerprint verdict cache for `dsh-auto-review`: reuses a recent
  * reviewer verdict (`{decision, reason, riskLevel}`) for an identical,
  * normalized `tool + arguments` fingerprint within a TTL, so a repeated
- * action does not pay a second-model round-trip. Independent pure module —
+ * action does not pay a same-model independent round-trip. Independent pure module —
  * it never reads the circuit breaker, the risk rules, the reviewer prompt,
  * or the session log; the runtime decides when a verdict is cacheable and
  * what a hit settles as.

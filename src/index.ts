@@ -1,5 +1,5 @@
 /**
- * `dsh-auto-review` — second-model AI auto-review for DeepSeek Harness
+ * `dsh-auto-review` — same-model independent AI auto-review for DeepSeek Harness
  * approval requests. Registers an answerer on the `approval/request`
  * waterfall that, when a session has auto-review enabled and the configured
  * tool/risk policy says `ai`, runs a read-only one-shot reviewer subagent
@@ -35,7 +35,7 @@ declare module '@deepseek-ai/cordis' {
 // Service Provider — `apply` (src/runtime.ts) registers the `approval/request`
 // answerer and the `tools/post-execute` deny-reason listener on the context.
 export { apply }
-export { AutoReviewRuntime } from './runtime.ts'
+export { AutoReviewRuntime, PRESET_GATE } from './runtime.ts'
 export * from './cache.ts'
 export * from './call-id.ts'
 export * from './config.ts'

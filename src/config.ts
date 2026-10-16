@@ -180,7 +180,7 @@ export interface Config {
   overrideTtlMs?: number
   /**
    * How long an identical `tool + arguments` fingerprint reuses its last
-   * verdict before the second model is consulted again, in milliseconds.
+   * verdict before the reviewer is consulted again, in milliseconds.
    * `0` disables the cache. Default 60000.
    */
   verdictCacheTtlMs?: number

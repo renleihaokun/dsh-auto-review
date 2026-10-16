@@ -177,7 +177,7 @@ describe('/auto-review command', () => {
     const harness = await mountHarness({ language: 'zh' })
     const result = invoke(harness.commands.registered[0], harness, 'status')
     expect((result as { text: string }).text).toContain('本会话的自动审查已开启。')
-    expect(harness.commands.registered[0]!.description).toContain('第二模型')
+    expect(harness.commands.registered[0]!.description).toContain('同模型独立')
     const bad = invoke(harness.commands.registered[0], harness, 'maybe')
     expect((bad as { text: string }).text).toContain('未知的 /auto-review 参数')
   })

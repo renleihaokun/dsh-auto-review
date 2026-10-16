@@ -223,4 +223,11 @@ action safe.]
 
 本分支只跟一条运行时线。`@deepseek-ai/dsh` 前进时，要动的是 `engines.dsh`、`peerDependencies` 区间、`devDependencies`，以及 `pnpm-workspace.yaml` 里的 `overrides` 表——然后重跑第五节的整套门禁。五份 README 是上游的、描述的是上游的兼容性；本分支的事实来源是 `package.json#desktopBranch` 和本文档。
 
+**有一个 CI job 在本分支上是预期失败的。** `host-compat` 跑的是 `scripts/check-host-versions.mjs`，它编码的是上游**同时支持多条 harness 线**时的**发布策略**。它有两处不适用于单线分支：
+
+- 它只解析 `0.1.x` 形式的 pin，所以本分支的 `>=0.2.0-rc.2 <0.3.0` 它根本不认识，直接以 *"no pinned @deepseek-ai/dsh-\* peers found"* 退出。
+- 就算认得出这个 pin，它的 alpha 规则仍然会失败：本分支**有意留在** `0.2.0-rc.2` 线上，而 `@deepseek-ai/dsh` 已经发布了 `0.2.1-alpha.5`。留在原线正是本分支存在的理由——跑 `0.2.0-rc.2` 的 profile 绝不能被塞进一棵 `0.2.1` 的树。
+
+`AGENTS.md` 明确允许这个结果（"bump the pins, **or document a deliberate stay-behind**"），本段就是那份说明。脚本保持原样以便本分支仍可向上游合并；fork 的 GitHub Actions 默认是关闭的——如果你打开它，在那个 job 上预期会红，直到 pin 移到新线为止。其它 job（`check`、打包产物冒烟测试）描述的是本分支的真实情况，应当通过。
+
 上游是 Apache-2.0。本分支保留 `LICENSE` 与原始 `author` 字段不变，在 `contributors` 里记录自己，并在此处与 `CHANGELOG.md` 里声明改动，符合许可证要求。本分支**与 PerryLink 无从属关系、也未获其背书**；README 里的徽章与链接仍指向上游项目——插件的文档、issue 与发布都在那里。

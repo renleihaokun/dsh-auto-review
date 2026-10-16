@@ -230,4 +230,11 @@ On the reference `0.2.0-rc.2` desktop profile, with `review` selected:
 
 The branch tracks exactly one runtime line. When `@deepseek-ai/dsh` moves, the pins to bump are `engines.dsh`, the `peerDependencies` band, `devDependencies`, and the `overrides` map in `pnpm-workspace.yaml` — then re-run the gate in §5. The five-language READMEs are upstream's and describe upstream's compatibility; `package.json#desktopBranch` and this document are the branch's source of truth.
 
+**One CI job is expected to fail on this branch.** `host-compat` runs `scripts/check-host-versions.mjs`, which encodes upstream's *release policy* for a package that supports several harness lines at once. Two things about it do not describe a single-line branch:
+
+- It parses only the `0.1.x` pin spellings, so this branch's `>=0.2.0-rc.2 <0.3.0` band is not recognized at all and it exits with *"no pinned @deepseek-ai/dsh-\* peers found"*.
+- Even with the pin understood, its alpha rule would still fail: the branch deliberately **stays behind** on the `0.2.0-rc.2` line while `@deepseek-ai/dsh` publishes `0.2.1-alpha.5`. Staying behind is the branch's whole point — it exists because a profile running `0.2.0-rc.2` must not be handed a `0.2.1` tree.
+
+`AGENTS.md` allows exactly this outcome ("bump the pins, **or document a deliberate stay-behind**"); this paragraph is that documentation. The script is left untouched so the branch stays mergeable, and GitHub Actions is off on the fork by default — if you enable it, expect that one job to be red until the pins move to a new line. The other jobs (`check`, the packed-artifact smoke test) describe the branch accurately and should pass.
+
 Upstream is Apache-2.0. This branch keeps the `LICENSE` and the original `author` field unchanged, records itself under `contributors`, and states its changes here and in `CHANGELOG.md`, as the license requires. It is **not** affiliated with or endorsed by PerryLink; the badges and links in the READMEs still point at the upstream project, which is where the plugin's documentation, issue tracker and releases live.
